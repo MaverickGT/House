@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: house-regression-gt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-model
+  template:
+    metadata:
+      labels:
+        app: ml-model
+    spec:
+      containers:
+        - name: regression-container
+          image: georgiterziyski/house-regression-gt:latest

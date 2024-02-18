@@ -57,8 +57,6 @@ def manage_outliers(df, column, method='IQR'):
 
         df[column] = df[column].clip(lower=lower_bound, upper=upper_bound)
 
-    # Other methods can be added here
-
     return df
 
 # List of numerical columns to check for outliers
@@ -76,7 +74,7 @@ sns.boxplot(x=house_data['Bathrooms'], ax=axes[0, 2])
 sns.boxplot(x=house_data['Offers'], ax=axes[1, 0])
 sns.boxplot(x=house_data['Price'], ax=axes[1, 1])
 axes[1, 2].set_visible(False) # Hide the last subplot as we have only 5 plots
-plt.show()
+#plt.show()
 
 # Convert categorical variables to one-hot encoded variables
 house_data_encoded = pd.get_dummies(house_data)
@@ -92,28 +90,18 @@ plt.show()
 
 # Pairplot to visualize relationships
 sns.pairplot(house_data)
-plt.show()
-
-# Box plots for numerical features to identify outliers
-fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))
-sns.boxplot(x=house_data['SqFt'], ax=axes[0, 0])
-sns.boxplot(x=house_data['Bedrooms'], ax=axes[0, 1])
-sns.boxplot(x=house_data['Bathrooms'], ax=axes[0, 2])
-sns.boxplot(x=house_data['Offers'], ax=axes[1, 0])
-sns.boxplot(x=house_data['Price'], ax=axes[1, 1])
-axes[1, 2].set_visible(False) # Hide the last subplot as we have only 5 plots
-plt.show()
+#plt.show()
 
 # Count plots for categorical features
 plt.figure(figsize=(12, 6))
 sns.countplot(x='Brick', data=house_data)
 plt.title('Count of Houses with and without Brick')
-plt.show()
+#plt.show()
 
 plt.figure(figsize=(12, 6))
 sns.countplot(x='Neighborhood', data=house_data)
 plt.title('Count of Houses in Different Neighborhoods')
-plt.show()
+#plt.show()
 
 # Split the data into features and target variable
 X = house_data_encoded.drop('Price', axis=1)
@@ -136,11 +124,15 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, r
 # Initialize Linear Regression model
 linear_reg = LinearRegression()
 
+# Set our tracking server uri for logging
+mlflow.set_tracking_uri(uri="http://localhost:5000")
+
 # Set the experiment name
 mlflow.set_experiment("House_Price_Prediction")
 
+def train_model():
 # Start an MLflow experiment
-with mlflow.start_run():
+    mlflow.start_run()
 
     # Train the model
     linear_reg.fit(X_train, y_train)
@@ -164,8 +156,8 @@ with mlflow.start_run():
     mlflow.log_artifact(pairplot_file)
 
     # Log the hyperparameters
-    mlflow.log_param("test_size", test_size)
-    mlflow.log_param("random_state", random_state)
+    mlflow.log_param("Test size", test_size)
+    mlflow.log_param("Random state", random_state)
     mlflow.log_metric("mse", mse)
     mlflow.log_metric("r2", r2)
 
@@ -183,9 +175,14 @@ with mlflow.start_run():
         input_example=X_train,
         registered_model_name="tracking-lr-model",
     )
+    # End the MLflow experiment
+    mlflow.end_run()
 
-# End the MLflow experiment
-mlflow.end_run()
+# Train the model
+if __name__ == "__main__":
+    train_model()
+
+
 
 
 
