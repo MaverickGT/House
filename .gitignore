@@ -1,2 +1,7 @@
 /mlruns
 /eda
+/mlartifacts
+/test
+eda_pairplot.png
+eda_summary.txt
+house_predictor_*

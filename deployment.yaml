@@ -1,17 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: house-regression-gt
+  name: house-price-predictor-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ml-model
+      app: house-price-predictor
   template:
     metadata:
       labels:
-        app: ml-model
+        app: house-price-predictor
     spec:
       containers:
-        - name: regression-container
-          image: georgiterziyski/house-regression-gt:latest
+      - name: house-price-predictor-container
+        image: georgiterziyski/house-price-predictor:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+          requests:
+            cpu: "0.5"
+            memory: "200Mi"
